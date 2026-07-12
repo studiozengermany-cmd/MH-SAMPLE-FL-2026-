@@ -12,7 +12,7 @@
     "build": "tsc --noEmit && vite build",
     "test": "node --test tests/*.test.cjs",
     "check": "npm run test && npm run build",
-    "dist:win": "npm run check && electron-builder --win nsis"
+    "dist:win": "npm run check && electron-builder --win nsis --publish never"
   },
   "dependencies": {
     "music-metadata": "11.13.0",
@@ -54,4 +54,3 @@
     }
   }
 }
-
