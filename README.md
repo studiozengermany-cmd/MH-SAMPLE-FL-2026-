@@ -51,6 +51,8 @@ npm run dist:win
 
 GitHub Actions cũng tự chạy quy trình Windows này và xuất file cài đặt dưới dạng build artifact.
 
+Build Windows gần nhất: [Windows Build #22 — thành công](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212467161). Mở trang run và tải artifact `MH-Sample-FL-Windows-2080f4741997215c1ac06f56084d9a622fd20ee1`.
+
 ## Tài liệu chính
 
 - [Đặc tả tổng thể](docs/00-MASTER-SPEC.md)
