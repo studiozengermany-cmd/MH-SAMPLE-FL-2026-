@@ -25,7 +25,7 @@ test("indexer quét WAV thật, đọc metadata, hash, search và backup", async
   const backupPath = path.join(dir, "mh-backup.sqlite");
   const db = new MhDatabase(databasePath);
   const events = [];
-  const indexer = new LibraryIndexer(db, (event) => events.push(event));
+  const indexer = new LibraryIndexer(db, (event) => events.push(event), { watch: false });
   const root = db.addRoot(dir);
   const result = await indexer.scanRoot(root.id);
   assert.equal(result.status, "indexed");
@@ -41,4 +41,3 @@ test("indexer quét WAV thật, đọc metadata, hash, search và backup", async
   assert.ok(fs.statSync(backupPath).size > 0);
   indexer.close(); db.close(); fs.rmSync(dir, { recursive: true, force: true });
 });
-
