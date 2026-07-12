@@ -53,6 +53,7 @@ Các mục trên phải giữ trạng thái `UNTESTED` cho tới khi GitHub Acti
 2. File watcher giữ debounce timer sau khi database đóng: đã quản lý watcher/timer record và hủy sạch trong `close()`.
 3. Backup API ban đầu gọi sai trên `DatabaseSync`: đã chuyển sang hàm `backup()` chính thức của `node:sqlite` và có integration test.
 4. Windows CI phát assertion khi integration test tạo watcher rồi xóa thư mục tạm: đã thêm chế độ `watch:false` dành riêng cho test; ứng dụng thật vẫn bật watcher.
+5. Electron-builder đã tạo xong installer nhưng CI fail vì implicit publish đòi `GH_TOKEN`: đã khóa `--publish never`; workflow chỉ upload artifact, không tự phát hành GitHub Release.
 
 ## Gate kế tiếp
 
