@@ -52,6 +52,8 @@ Kết quả:
 - Artifact digest: `sha256:4fbb7173674f49743d3daf6cc5d69b77416fc6ed1cd45f655acb983f0f7465f5`.
 - GitHub expiry hiện tại: `26/07/2026`; có thể build lại từ source bất kỳ lúc nào.
 
+Workflow kế tiếp đã bổ sung smoke launch: mở `release/win-unpacked/MH Sample FL.exe`, giữ process 8 giây rồi mới upload artifact. Kết quả smoke launch phải được ghi nhận ở build artifact mới nhất trước khi nâng trạng thái runtime.
+
 ## Chưa được phép tuyên bố hoàn thành
 
 - Chưa chạy cửa sổ Electron thật trong sandbox vì binary Electron không tải được tại môi trường này.
