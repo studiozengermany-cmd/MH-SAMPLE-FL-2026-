@@ -3,9 +3,10 @@ const path = require("node:path");
 const { isSupportedAudioFile, createStableId, hashFile } = require("./utils.cjs");
 
 class LibraryIndexer {
-  constructor(database, emitProgress) {
+  constructor(database, emitProgress, options = {}) {
     this.database = database;
     this.emitProgress = emitProgress;
+    this.watchEnabled = options.watch !== false;
     this.active = new Map();
     this.watchers = new Map();
   }
@@ -80,7 +81,7 @@ class LibraryIndexer {
       this.database.finishRootScan(rootId);
       const result = { rootId, status: "indexed", processed, bytes, errors };
       this.emitProgress(result);
-      this.startWatching(rootId);
+      if (this.watchEnabled) this.startWatching(rootId);
       return result;
     } catch (error) {
       const cancelled = error.message === "SCAN_CANCELLED";
