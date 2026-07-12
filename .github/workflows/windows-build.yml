@@ -39,6 +39,16 @@ jobs:
       - name: Build Windows installer
         run: npm run dist:win
 
+      - name: Smoke launch packaged desktop app
+        shell: pwsh
+        run: |
+          $app = Start-Process -FilePath "release\win-unpacked\MH Sample FL.exe" -ArgumentList "--disable-gpu" -PassThru
+          Start-Sleep -Seconds 8
+          if ($app.HasExited) {
+            throw "Packaged desktop app exited during smoke launch with code $($app.ExitCode)"
+          }
+          Stop-Process -Id $app.Id -Force
+
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
@@ -48,4 +58,3 @@ jobs:
             release/*.yml
           if-no-files-found: error
           retention-days: 14
-
