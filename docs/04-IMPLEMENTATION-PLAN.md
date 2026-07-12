@@ -13,11 +13,11 @@
 **Đầu ra:** repository greenfield, tài liệu, ADR, threat/safety rules, backlog và test strategy.
 
 - Chốt tên, scope, non-goals và terminology.
-- Chốt cấu trúc workspace, coding standards và CI cơ bản.
-- Dựng bốn proof-of-concept Gate A–D, ưu tiên desktop drag trước.
-- Quyết định Tauri/native helper/shell dựa trên kết quả Gate A.
+- Chốt Electron + React/TypeScript + Node SQLite theo ADR-009.
+- Dựng CI Windows và tiếp tục bốn Technical Gate A–D, ưu tiên desktop drag trên FL Studio thật.
+- Chỉ đổi shell/engine khi có benchmark hoặc lỗi host được chứng minh.
 
-**Không được qua M1 nếu:** drag strategy, audio pipeline, database recovery hoặc index/search architecture chưa có kết luận thử nghiệm.
+**Baseline v0.1:** source đã đi qua M1–M8 ở mức alpha theo `docs/09-IMPLEMENTATION-STATUS.md`; các gate Windows/FL/performance chưa đạt vẫn phải giữ UNTESTED, không được hợp thức hóa bằng việc UI đã build.
 
 ## Milestone 1 — App shell và persistence
 
@@ -119,4 +119,3 @@
 6. `DATA-001`: Schema/migrations v1.
 7. `APP-001`: Desktop shell/settings/data locations.
 8. `IDX-001`: Add root và fast index vertical slice.
-
