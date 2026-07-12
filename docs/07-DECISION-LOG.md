@@ -51,9 +51,17 @@
 - Trạng thái: Accepted
 - Quyết định: `VST-GATE-000` bị khóa cho tới khi ứng dụng desktop hoàn tất nghiệm thu nền tảng và chủ dự án mở giai đoạn bằng quyết định riêng.
 
+## ADR-009 — Electron cho desktop v0.1
+
+- Ngày: 12/07/2026
+- Trạng thái: Accepted for alpha
+- Quyết định: dùng Electron + React/TypeScript, Node main process và `node:sqlite` cho bản desktop đầu tiên.
+- Lý do: Electron có native file-drag API, Chromium audio/waveform, đóng gói Windows và IPC context-isolated; cho phép tạo vertical slice chạy được mà không chờ VST3 hoặc Rust bridge.
+- Guardrail: renderer không có Node integration; source audio read-only; FL drag vẫn phải test thật. Chỉ chuyển engine sang Rust khi benchmark 100k hoặc bằng chứng ổn định buộc phải đổi.
+
 ## Quyết định đang chờ Gate
 
-- Shell cuối cùng: Tauri hay phương án khác, sau Gate A.
+- Electron có được giữ cho beta hay cần tách Rust engine, sau benchmark Gate C/D.
 - Audio decoder/player libraries, sau Gate B.
 - File watcher strategy chi tiết và optional USN, sau prototype.
 - Near-duplicate/similar-sound, sau khi exact duplicate MVP ổn định.
