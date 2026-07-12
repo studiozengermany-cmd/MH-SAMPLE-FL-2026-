@@ -24,7 +24,32 @@ MH Sample FL là ứng dụng desktop local-first dành cho producer sử dụng
 
 ## Trạng thái hiện tại
 
-`PLANNING / GREENFIELD` — repository mới chỉ chứa hồ sơ đặc tả và kế hoạch triển khai. Chưa có code ứng dụng và chưa có VST3.
+`v0.1.0-alpha / DESKTOP MVP` — đã có source ứng dụng desktop, SQLite, indexer, tìm kiếm, audio preview/waveform, Project Memory, license, exact duplicate report, backup/export và giao diện dark studio. VST3 chưa được triển khai và vẫn bị khóa bằng policy gate.
+
+Xem trạng thái test chính xác tại [Implementation Status](docs/09-IMPLEMENTATION-STATUS.md).
+
+## Chạy ứng dụng khi phát triển
+
+Yêu cầu Node.js 24 trở lên.
+
+```bash
+npm install
+npm run dev
+```
+
+Kiểm tra toàn bộ unit/integration test và production renderer build:
+
+```bash
+npm run check
+```
+
+Đóng gói bộ cài Windows NSIS:
+
+```bash
+npm run dist:win
+```
+
+GitHub Actions cũng tự chạy quy trình Windows này và xuất file cài đặt dưới dạng build artifact.
 
 ## Tài liệu chính
 
@@ -37,25 +62,35 @@ MH Sample FL là ứng dụng desktop local-first dành cho producer sử dụng
 - [Lộ trình VST3 giai đoạn sau](docs/06-VST3-PHASE-2.md)
 - [Nhật ký quyết định](docs/07-DECISION-LOG.md)
 - [Cam kết thực thi và truy vết yêu cầu](docs/08-EXECUTION-GOVERNANCE.md)
+- [Trạng thái triển khai và bằng chứng](docs/09-IMPLEMENTATION-STATUS.md)
 
-## Cấu trúc code dự kiến
+## Cấu trúc source hiện tại
 
 ```text
 MH-Sample-FL/
-├─ apps/
-│  └─ desktop/                 # UI desktop và Tauri shell
-├─ crates/
-│  ├─ mh-domain/               # Quy tắc nghiệp vụ thuần
-│  ├─ mh-application/          # Use cases/commands/queries
-│  ├─ mh-database/             # SQLite, migrations, repositories
-│  ├─ mh-indexer/              # Scan, watcher, hash, job queue
-│  ├─ mh-audio/                # Decode, preview, waveform, metadata
-│  └─ mh-platform-windows/     # Windows paths, OLE drag, file identity
+├─ src/
+│  ├─ main/                    # Electron main, SQLite, indexer, filesystem
+│  ├─ preload/                 # IPC bridge có context isolation
+│  └─ renderer/                # React/TypeScript UI, waveform và workflow
 ├─ tests/
-│  ├─ fixtures/
-│  ├─ integration/
-│  └─ e2e/
+│  ├─ database.test.cjs
+│  ├─ indexer.test.cjs
+│  └─ utils.test.cjs
+├─ .github/workflows/          # Test và đóng gói Windows
 └─ docs/
 ```
 
-Các thư mục code chỉ được scaffold sau khi Milestone 0 và Technical Gate A được duyệt.
+Thư mục VST3/JUCE không tồn tại trong codebase. Chỉ ứng dụng desktop đang được triển khai.
+
+## Chức năng v0.1.0-alpha
+
+- Chọn và quét thư mục sample thật; không quét ngoài phạm vi người dùng chọn.
+- Index tăng dần, SHA-256, metadata audio, watcher, cancel và progress.
+- SQLite WAL + FTS5, tìm kiếm, filter, sort, favorite, rating, tags và notes.
+- Preview audio qua protocol nội bộ, waveform thật và player không sửa file nguồn.
+- Project Workspace và Project Memory tách `sent_to_fl` khỏi `user_confirmed`.
+- Native desktop drag bridge qua Electron; cần nghiệm thu trực tiếp trên FL Studio Windows.
+- License/source metadata.
+- Exact duplicate report chỉ đọc/mô phỏng; không xóa hoặc hard-link.
+- Backup SQLite và export JSON.
+- UI tiếng Việt, desktop-first, có loading/empty/error states.
