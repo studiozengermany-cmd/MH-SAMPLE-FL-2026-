@@ -40,19 +40,20 @@ Kết quả:
 ## Bằng chứng Windows CI
 
 - Workflow: `Windows Build`.
-- Run: [`29212467161`](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212467161).
-- Commit: `2080f4741997215c1ac06f56084d9a622fd20ee1`.
+- Run: [`29212590864`](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212590864).
+- Commit: `b0ef607e86ac8b2c6fa16ed50e765d317b1abe23`.
 - Install dependencies: PASS.
 - 6/6 tests trên Windows: PASS.
 - TypeScript/Vite production build: PASS.
 - Electron-builder NSIS: PASS.
+- Smoke launch packaged `MH Sample FL.exe` trong 8 giây: PASS.
 - Upload artifact: PASS.
-- Artifact: `MH-Sample-FL-Windows-2080f4741997215c1ac06f56084d9a622fd20ee1`.
-- Artifact size: `100,186,485 bytes`.
-- Artifact digest: `sha256:4fbb7173674f49743d3daf6cc5d69b77416fc6ed1cd45f655acb983f0f7465f5`.
+- Artifact: `MH-Sample-FL-Windows-b0ef607e86ac8b2c6fa16ed50e765d317b1abe23`.
+- Artifact size: `100,186,459 bytes`.
+- Artifact digest: `sha256:15302f2b47b3d2248047157054d0cec7e96b19b9ad44d27744959f4ad0857797`.
 - GitHub expiry hiện tại: `26/07/2026`; có thể build lại từ source bất kỳ lúc nào.
 
-Workflow kế tiếp đã bổ sung smoke launch: mở `release/win-unpacked/MH Sample FL.exe`, giữ process 8 giây rồi mới upload artifact. Kết quả smoke launch phải được ghi nhận ở build artifact mới nhất trước khi nâng trạng thái runtime.
+Smoke launch đã chứng minh bản đóng gói khởi động và giữ process sống trên Windows runner. Nó chưa thay thế nghiệm thu thao tác thật trên Windows 10 và FL Studio của chủ dự án.
 
 ## Chưa được phép tuyên bố hoàn thành
 
