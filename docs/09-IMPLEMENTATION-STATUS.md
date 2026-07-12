@@ -52,6 +52,7 @@ Các mục trên phải giữ trạng thái `UNTESTED` cho tới khi GitHub Acti
 1. `bm25()` không hợp lệ trong truy vấn FTS có `GROUP BY`: đã thay tag aggregation bằng correlated subquery và dùng FTS rank.
 2. File watcher giữ debounce timer sau khi database đóng: đã quản lý watcher/timer record và hủy sạch trong `close()`.
 3. Backup API ban đầu gọi sai trên `DatabaseSync`: đã chuyển sang hàm `backup()` chính thức của `node:sqlite` và có integration test.
+4. Windows CI phát assertion khi integration test tạo watcher rồi xóa thư mục tạm: đã thêm chế độ `watch:false` dành riêng cho test; ứng dụng thật vẫn bật watcher.
 
 ## Gate kế tiếp
 
@@ -61,4 +62,3 @@ Các mục trên phải giữ trạng thái `UNTESTED` cho tới khi GitHub Acti
 2. Tải artifact và cài trên Windows 10.
 3. Add Folder → scan WAV thật → search → preview → create project → drag sang FL → confirm usage → backup.
 4. Ghi log/screenshot/video và cập nhật bảng này.
-
