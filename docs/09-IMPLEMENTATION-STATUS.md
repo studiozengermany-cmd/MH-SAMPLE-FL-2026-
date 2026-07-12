@@ -37,10 +37,25 @@ Kết quả:
 - Vite production build: PASS.
 - Renderer bundle được tạo thành công trong `dist/`.
 
+## Bằng chứng Windows CI
+
+- Workflow: `Windows Build`.
+- Run: [`29212467161`](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212467161).
+- Commit: `2080f4741997215c1ac06f56084d9a622fd20ee1`.
+- Install dependencies: PASS.
+- 6/6 tests trên Windows: PASS.
+- TypeScript/Vite production build: PASS.
+- Electron-builder NSIS: PASS.
+- Upload artifact: PASS.
+- Artifact: `MH-Sample-FL-Windows-2080f4741997215c1ac06f56084d9a622fd20ee1`.
+- Artifact size: `100,186,485 bytes`.
+- Artifact digest: `sha256:4fbb7173674f49743d3daf6cc5d69b77416fc6ed1cd45f655acb983f0f7465f5`.
+- GitHub expiry hiện tại: `26/07/2026`; có thể build lại từ source bất kỳ lúc nào.
+
 ## Chưa được phép tuyên bố hoàn thành
 
 - Chưa chạy cửa sổ Electron thật trong sandbox vì binary Electron không tải được tại môi trường này.
-- Chưa build/khởi động bộ cài trên Windows 10 của chủ dự án.
+- Đã build bộ cài bằng Windows GitHub runner; chưa khởi động/cài trên Windows 10 của chủ dự án.
 - Chưa kiểm thử native drag với Channel Rack, Playlist, Sampler của FL Studio.
 - Chưa chạy performance test với thư viện 100.000 sample.
 - Chưa kiểm thử crash/power-loss thực tế trên Windows.
