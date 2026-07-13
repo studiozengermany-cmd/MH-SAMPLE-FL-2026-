@@ -46,6 +46,8 @@ Thiếu bất kỳ mắt xích nào thì trạng thái tối đa là `IN PROGRES
 - `LIB-003`: Index tăng dần, có pause/resume/cancel/retry và crash recovery.
 - `LIB-004`: Hỗ trợ Unicode, đường dẫn dài và ổ bị ngắt kết nối.
 - `LIB-005`: Tất cả trạng thái Indexed/Pending/Missing/Error lấy từ dữ liệu thật.
+- `LIB-006`: Mọi root phải giữ nguyên cây thư mục cha–con, bao gồm folder rỗng; cấm gộp folder con thành một danh sách phẳng.
+- `LIB-007`: Fast discovery phải đưa folder/file vào UI trước deep metadata/hash; progress tách `discovered` và `analyzed`.
 
 ### Search và audio
 
@@ -55,6 +57,15 @@ Thiếu bất kỳ mắt xích nào thì trạng thái tối đa là `IN PROGRES
 - `AUD-002`: Chỉ một sample phát tại một thời điểm.
 - `AUD-003`: Gain/normalize chỉ nghe thử và không đổi checksum file gốc.
 - `AUD-004`: Decode error/unsupported có thông báo và không làm app crash.
+- `AUD-005`: BPM/key phải ghi giá trị, nguồn và confidence; không có bằng chứng thì hiển thị `Chưa xác minh`.
+- `AUD-006`: Preview tempo-sync dùng BPM project và không sửa file nguồn.
+- `AUD-007`: Vùng In/Out tự nạp sample đang chọn, nghe được vùng và chỉ xuất thành file WAV mới theo đường dẫn người dùng xác nhận.
+
+### Giao diện và thao tác
+
+- `UX-001`: Màn hình thư viện bám bố cục mockup đã duyệt: Local Crate, results, sample inspector, waveform, Project Memory và vùng drag rõ ràng.
+- `UX-002`: Sidebar, chiều cao results/inspector, chiều rộng Project Memory và từng cột bảng có thể kéo đổi kích thước, được lưu và có Reset Layout.
+- `UX-003`: Icon outline đồng nhất; không emoji, số liệu giả, card trang trí hoặc giao diện SaaS/AI chung chung.
 
 ### Project Memory
 
@@ -128,4 +139,3 @@ Mỗi checkpoint phải có:
 3. Nêu lựa chọn và hệ quả.
 4. Cập nhật ADR, tests và backlog.
 5. Được chủ dự án duyệt trước khi coi là baseline mới.
-

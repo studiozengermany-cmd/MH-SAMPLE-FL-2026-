@@ -14,13 +14,23 @@
 
 `id`, `display_name`, `absolute_path`, `volume_id`, `root_type`, `enabled`, `recursive`, `status`, `last_scan_at`, `created_at`, `updated_at`.
 
+### `folders`
+
+`id`, `stable_id`, `root_id`, `parent_id`, `path`, `relative_path`, `name`, `depth`, `available`, `updated_at`.
+
+- Root được trình bày như node ảo từ `library_roots`; từng folder con là một record thật.
+- `parent_id` giữ quan hệ cha–con; folder rỗng vẫn tồn tại.
+- Count trực tiếp và count toàn nhánh được truy vấn riêng; filter một folder bao gồm toàn bộ descendants bằng recursive CTE.
+
 ### `samples`
 
-`id`, `library_root_id`, `current_path`, `relative_path`, `filename`, `extension`, `file_size`, `modified_at_fs`, `created_at_fs`, `availability_status`, `file_identity`, `exact_hash`, `fingerprint`, `first_indexed_at`, `last_seen_at`.
+`id`, `library_root_id`, `folder_id`, `current_path`, `relative_path`, `filename`, `extension`, `file_size`, `modified_at_fs`, `created_at_fs`, `availability_status`, `file_identity`, `exact_hash`, `fingerprint`, `first_indexed_at`, `last_seen_at`.
 
 ### `audio_metadata`
 
 `sample_id`, `codec`, `duration_ms`, `sample_rate`, `bit_depth`, `channels`, `bitrate`, `bpm_auto`, `bpm_confidence`, `key_auto`, `key_confidence`, `category_auto`, `category_confidence`, `analysis_version`.
+
+Alpha schema hiện lưu trực tiếp `bpm_original`, `bpm_confidence`, `musical_key`, `key_confidence`, `analysis_source` trên `samples`. `analysis_source` hiện có `embedded_metadata|filename|unavailable`; tuyệt đối không biến `unavailable` thành kết quả đoán.
 
 ### `waveform_cache`
 
@@ -80,4 +90,3 @@ Settings phải tách machine settings khỏi user preferences. Backup snapshot 
 - `verified_reference_count`: số reference được công cụ xác minh.
 
 UI phải ghi đúng loại count; không dùng nhãn chung “Used” nếu dữ liệu gồm nhiều nguồn khác nhau.
-

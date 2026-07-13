@@ -13,6 +13,13 @@ class MhDatabase {
   }
 
   migrate() {
+    const hasMigrationTable = Boolean(this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='schema_migrations'").get());
+    const previousVersion = hasMigrationTable ? Number(this.db.prepare("SELECT COALESCE(MAX(version),0) version FROM schema_migrations").get().version) : 0;
+    if (previousVersion > 0 && previousVersion < 2) {
+      const backupPath = `${this.path}.before-v2-${Date.now()}.sqlite`;
+      this.db.prepare("VACUUM INTO ?").run(backupPath);
+      this.lastMigrationBackup = backupPath;
+    }
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS schema_migrations (
         version INTEGER PRIMARY KEY,
@@ -31,6 +38,19 @@ class MhDatabase {
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
+      CREATE TABLE IF NOT EXISTS folders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        stable_id TEXT NOT NULL UNIQUE,
+        root_id INTEGER NOT NULL REFERENCES library_roots(id) ON DELETE CASCADE,
+        parent_id INTEGER REFERENCES folders(id) ON DELETE CASCADE,
+        path TEXT NOT NULL UNIQUE,
+        relative_path TEXT NOT NULL,
+        name TEXT NOT NULL,
+        depth INTEGER NOT NULL DEFAULT 1,
+        available INTEGER NOT NULL DEFAULT 1,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_folders_root_parent ON folders(root_id,parent_id);
       CREATE TABLE IF NOT EXISTS samples (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         stable_id TEXT NOT NULL UNIQUE,
@@ -136,6 +156,18 @@ class MhDatabase {
       );
       INSERT OR IGNORE INTO schema_migrations(version) VALUES(1);
     `);
+    this.ensureColumn("samples", "folder_id", "INTEGER REFERENCES folders(id) ON DELETE SET NULL");
+    this.ensureColumn("samples", "bpm_original", "REAL");
+    this.ensureColumn("samples", "bpm_confidence", "REAL");
+    this.ensureColumn("samples", "musical_key", "TEXT");
+    this.ensureColumn("samples", "key_confidence", "REAL");
+    this.ensureColumn("samples", "analysis_source", "TEXT NOT NULL DEFAULT 'unavailable'");
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_samples_folder ON samples(folder_id); INSERT OR IGNORE INTO schema_migrations(version) VALUES(2);`);
+  }
+
+  ensureColumn(table, column, definition) {
+    const exists = this.db.prepare(`PRAGMA table_info(${table})`).all().some((entry) => entry.name === column);
+    if (!exists) this.db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
   }
 
   close() { this.db.close(); }
@@ -160,6 +192,7 @@ class MhDatabase {
   }
   beginRootScan(id) {
     this.db.prepare("UPDATE samples SET available=0 WHERE root_id=?").run(id);
+    this.db.prepare("UPDATE folders SET available=0 WHERE root_id=?").run(id);
     this.db.prepare("DELETE FROM scan_errors WHERE root_id=?").run(id);
     this.setRootStatus(id, "scanning");
   }
@@ -172,19 +205,51 @@ class MhDatabase {
     this.db.prepare("INSERT INTO scan_errors(root_id,path,code,message) VALUES(?,?,?,?)").run(rootId, filePath, code, message);
   }
 
+  upsertFolder(folder) {
+    this.db.prepare(`INSERT INTO folders(stable_id,root_id,parent_id,path,relative_path,name,depth,available)
+      VALUES(@stable_id,@root_id,@parent_id,@path,@relative_path,@name,@depth,1)
+      ON CONFLICT(path) DO UPDATE SET stable_id=excluded.stable_id,root_id=excluded.root_id,parent_id=excluded.parent_id,
+      relative_path=excluded.relative_path,name=excluded.name,depth=excluded.depth,available=1,updated_at=CURRENT_TIMESTAMP`).run(folder);
+    return this.db.prepare("SELECT * FROM folders WHERE path=?").get(folder.path);
+  }
+
+  listFolderTree(rootId) {
+    const rows = this.db.prepare(`SELECT f.*,
+      (SELECT COUNT(*) FROM samples s WHERE s.folder_id=f.id AND s.available=1) direct_sample_count,
+      (SELECT COUNT(*) FROM samples s JOIN folders child ON child.id=s.folder_id
+        WHERE s.available=1 AND child.root_id=f.root_id AND (child.id=f.id OR child.relative_path LIKE f.relative_path || '/%')) total_sample_count
+      FROM folders f WHERE f.root_id=? ORDER BY f.relative_path COLLATE NOCASE`).all(Number(rootId));
+    const byParent = new Map();
+    for (const row of rows) {
+      const key = row.parent_id || 0;
+      if (!byParent.has(key)) byParent.set(key, []);
+      byParent.get(key).push({ ...row, children: [] });
+    }
+    const attach = (parentId = 0) => (byParent.get(parentId) || []).map((node) => ({ ...node, children: attach(node.id) }));
+    return attach();
+  }
+
   upsertSample(sample) {
-    this.db.prepare(`INSERT INTO samples(stable_id,root_id,path,filename,extension,size_bytes,mtime_ms,duration_ms,sample_rate,bit_depth,channels,codec,exact_hash,available)
-      VALUES(@stable_id,@root_id,@path,@filename,@extension,@size_bytes,@mtime_ms,@duration_ms,@sample_rate,@bit_depth,@channels,@codec,@exact_hash,1)
+    sample = {
+      folder_id: null, duration_ms: null, sample_rate: null, bit_depth: null, channels: null, codec: null,
+      exact_hash: null, bpm_original: null, bpm_confidence: null, musical_key: null, key_confidence: null,
+      analysis_source: "unavailable", ...sample
+    };
+    this.db.prepare(`INSERT INTO samples(stable_id,root_id,folder_id,path,filename,extension,size_bytes,mtime_ms,duration_ms,sample_rate,bit_depth,channels,codec,exact_hash,bpm_original,bpm_confidence,musical_key,key_confidence,analysis_source,available)
+      VALUES(@stable_id,@root_id,@folder_id,@path,@filename,@extension,@size_bytes,@mtime_ms,@duration_ms,@sample_rate,@bit_depth,@channels,@codec,@exact_hash,@bpm_original,@bpm_confidence,@musical_key,@key_confidence,@analysis_source,1)
       ON CONFLICT(path) DO UPDATE SET stable_id=excluded.stable_id, root_id=excluded.root_id, filename=excluded.filename,
-      extension=excluded.extension, size_bytes=excluded.size_bytes, mtime_ms=excluded.mtime_ms,
+      folder_id=excluded.folder_id,extension=excluded.extension, size_bytes=excluded.size_bytes, mtime_ms=excluded.mtime_ms,
       duration_ms=COALESCE(excluded.duration_ms,samples.duration_ms), sample_rate=COALESCE(excluded.sample_rate,samples.sample_rate),
       bit_depth=COALESCE(excluded.bit_depth,samples.bit_depth), channels=COALESCE(excluded.channels,samples.channels),
       codec=COALESCE(excluded.codec,samples.codec),
-      exact_hash=excluded.exact_hash, available=1, updated_at=CURRENT_TIMESTAMP`).run(sample);
+      exact_hash=COALESCE(excluded.exact_hash,samples.exact_hash),bpm_original=COALESCE(excluded.bpm_original,samples.bpm_original),
+      bpm_confidence=COALESCE(excluded.bpm_confidence,samples.bpm_confidence),musical_key=COALESCE(excluded.musical_key,samples.musical_key),
+      key_confidence=COALESCE(excluded.key_confidence,samples.key_confidence),analysis_source=CASE WHEN excluded.analysis_source='unavailable' THEN samples.analysis_source ELSE excluded.analysis_source END,
+      available=1, updated_at=CURRENT_TIMESTAMP`).run(sample);
     return this.db.prepare("SELECT * FROM samples WHERE path=?").get(sample.path);
   }
 
-  existingFile(filePath) { return this.db.prepare("SELECT id,size_bytes,mtime_ms,exact_hash FROM samples WHERE path=?").get(filePath); }
+  existingFile(filePath) { return this.db.prepare("SELECT id,size_bytes,mtime_ms,exact_hash,duration_ms,sample_rate,bit_depth,channels,codec,bpm_original,bpm_confidence,musical_key,key_confidence,analysis_source FROM samples WHERE path=?").get(filePath); }
 
   searchSamples(params = {}) {
     const query = String(params.query || "").trim();
@@ -196,11 +261,18 @@ class MhDatabase {
       clauses.push("samples_fts MATCH ?"); values.push(sanitizeFtsQuery(query));
     }
     if (params.rootId) { clauses.push("s.root_id=?"); values.push(Number(params.rootId)); }
+    if (params.folderId) {
+      clauses.push(`s.folder_id IN (WITH RECURSIVE descendants(id) AS (
+        SELECT id FROM folders WHERE id=? UNION ALL SELECT f.id FROM folders f JOIN descendants d ON f.parent_id=d.id
+      ) SELECT id FROM descendants)`);
+      values.push(Number(params.folderId));
+    }
     if (params.extension) { clauses.push("s.extension=?"); values.push(String(params.extension)); }
     if (params.favorite) clauses.push("s.favorite=1");
     if (params.available === "missing") clauses.push("s.available=0");
     if (params.available !== "all" && params.available !== "missing") clauses.push("s.available=1");
     const allowedSorts = {
+      context: query ? "samples_fts.rank, s.confirmed_usage_count DESC, s.preview_count DESC" : "s.favorite DESC, s.confirmed_usage_count DESC, s.preview_count DESC, s.updated_at DESC",
       relevance: query ? "samples_fts.rank, s.filename COLLATE NOCASE" : "s.updated_at DESC",
       name: "s.filename COLLATE NOCASE ASC",
       recent: "s.updated_at DESC",
@@ -209,17 +281,19 @@ class MhDatabase {
     };
     const sort = allowedSorts[params.sort] || allowedSorts.relevance;
     const limit = Math.min(Math.max(Number(params.limit) || 250, 1), 1000);
-    const rows = this.db.prepare(`SELECT s.*, r.display_name AS root_name,
+    const rows = this.db.prepare(`SELECT s.*, r.display_name AS root_name, f.name AS folder_name, f.relative_path AS folder_relative_path,
       COALESCE((SELECT GROUP_CONCAT(t.name) FROM tags t JOIN sample_tags st ON st.tag_id=t.id WHERE st.sample_id=s.id),'') AS tags
       FROM samples s ${join}
       JOIN library_roots r ON r.id=s.root_id
+      LEFT JOIN folders f ON f.id=s.folder_id
       WHERE ${clauses.join(" AND ")}
       ORDER BY ${sort} LIMIT ?`).all(...values, limit);
     return rows.map((row) => ({ ...row, tags: row.tags ? row.tags.split(",") : [] }));
   }
 
   getSample(id) {
-    const sample = this.db.prepare(`SELECT s.*, r.display_name AS root_name FROM samples s JOIN library_roots r ON r.id=s.root_id WHERE s.id=?`).get(id);
+    const sample = this.db.prepare(`SELECT s.*, r.display_name AS root_name, f.name AS folder_name, f.relative_path AS folder_relative_path
+      FROM samples s JOIN library_roots r ON r.id=s.root_id LEFT JOIN folders f ON f.id=s.folder_id WHERE s.id=?`).get(id);
     if (!sample) return null;
     sample.tags = this.db.prepare("SELECT t.name FROM tags t JOIN sample_tags st ON st.tag_id=t.id WHERE st.sample_id=? ORDER BY t.name").all(id).map((x) => x.name);
     sample.license = this.db.prepare("SELECT * FROM licenses WHERE sample_id=?").get(id) || null;
@@ -321,7 +395,7 @@ class MhDatabase {
       tags: this.db.prepare("SELECT t.name FROM tags t JOIN sample_tags st ON st.tag_id=t.id WHERE st.sample_id=? ORDER BY t.name").all(sample.id).map((tag) => tag.name),
       license: this.db.prepare("SELECT * FROM licenses WHERE sample_id=?").get(sample.id) || null
     }));
-    return { exported_at: new Date().toISOString(), roots: this.listRoots(), samples, projects: this.listProjects(), memories: this.listMemories(), duplicates: this.duplicateGroups() };
+    return { exported_at: new Date().toISOString(), roots: this.listRoots(), folders: this.db.prepare("SELECT * FROM folders ORDER BY root_id,relative_path").all(), samples, projects: this.listProjects(), memories: this.listMemories(), duplicates: this.duplicateGroups() };
   }
 }
 

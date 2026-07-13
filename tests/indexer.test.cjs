@@ -41,3 +41,36 @@ test("indexer quét WAV thật, đọc metadata, hash, search và backup", async
   assert.ok(fs.statSync(backupPath).size > 0);
   indexer.close(); db.close(); fs.rmSync(dir, { recursive: true, force: true });
 });
+
+test("indexer giữ nguyên cây folder lồng nhau, folder rỗng và lọc theo nhánh", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "mh-folder-tree-test-"));
+  const kicks = path.join(dir, "Drums", "Kicks");
+  const snares = path.join(dir, "Drums", "Snares");
+  const empty = path.join(dir, "Vocals", "Empty Pack");
+  fs.mkdirSync(kicks, { recursive: true }); fs.mkdirSync(snares, { recursive: true }); fs.mkdirSync(empty, { recursive: true });
+  fs.writeFileSync(path.join(kicks, "Kick 128BPM Am.wav"), makeSilentWav());
+  fs.writeFileSync(path.join(snares, "Snare.wav"), makeSilentWav());
+  const db = new MhDatabase(path.join(dir, "tree.sqlite")); const events = [];
+  const indexer = new LibraryIndexer(db, (event) => events.push(event), { watch: false }); const root = db.addRoot(dir);
+  const result = await indexer.scanRoot(root.id); const tree = db.listFolderTree(root.id);
+  assert.equal(result.folders, 5); assert.deepEqual(tree.map((item) => item.name), ["Drums", "Vocals"]);
+  const drums = tree.find((item) => item.name === "Drums"); const kickFolder = drums.children.find((item) => item.name === "Kicks");
+  const emptyFolder = tree.find((item) => item.name === "Vocals").children.find((item) => item.name === "Empty Pack");
+  assert.equal(drums.total_sample_count, 2); assert.equal(kickFolder.total_sample_count, 1); assert.equal(emptyFolder.total_sample_count, 0);
+  const kickRows = db.searchSamples({ folderId: kickFolder.id, available: "available" });
+  assert.equal(kickRows.length, 1); assert.equal(kickRows[0].folder_relative_path, "Drums/Kicks");
+  assert.equal(kickRows[0].bpm_original, 128); assert.equal(kickRows[0].musical_key, "Am"); assert.equal(kickRows[0].analysis_source, "filename");
+  assert.ok(events.some((event) => event.status === "discovering")); assert.ok(events.some((event) => event.status === "analyzing"));
+  indexer.close(); db.close(); fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("file audio hỏng vẫn được phát hiện và ghi lỗi metadata minh bạch", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "mh-corrupt-audio-test-"));
+  fs.writeFileSync(path.join(dir, "Broken 140BPM Dm.wav"), Buffer.from("not-a-wave"));
+  const db = new MhDatabase(path.join(dir, "corrupt.sqlite")); const indexer = new LibraryIndexer(db, () => {}, { watch: false }); const root = db.addRoot(dir);
+  const result = await indexer.scanRoot(root.id); const rows = db.searchSamples({ rootId: root.id, available: "available" });
+  assert.equal(result.status, "indexed"); assert.equal(rows.length, 1); assert.equal(rows[0].bpm_original, 140); assert.equal(rows[0].musical_key, "Dm");
+  const errors = db.db.prepare("SELECT code FROM scan_errors WHERE root_id=?").all(root.id);
+  assert.ok(errors.some((entry) => entry.code === "AUDIO_METADATA_UNREADABLE"));
+  indexer.close(); db.close(); fs.rmSync(dir, { recursive: true, force: true });
+});

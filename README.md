@@ -24,7 +24,7 @@ MH Sample FL là ứng dụng desktop local-first dành cho producer sử dụng
 
 ## Trạng thái hiện tại
 
-`v0.1.0-alpha / DESKTOP MVP` — đã có source ứng dụng desktop, SQLite, indexer, tìm kiếm, audio preview/waveform, Project Memory, license, exact duplicate report, backup/export và giao diện dark studio. VST3 chưa được triển khai và vẫn bị khóa bằng policy gate.
+`v0.1.0-alpha / DESKTOP REDESIGN IN PROGRESS` — source hiện có cây folder thật, fast discovery + deep analysis, SQLite search, BPM/key provenance, tempo-sync preview, waveform + vùng trim xuất WAV mới, Project Memory, exact duplicate report, backup/export và workspace dark studio kéo resize. Runtime Windows/FL Studio của bản redesign vẫn chờ evidence mới. VST3 chưa được triển khai và vẫn bị khóa bằng policy gate.
 
 Xem trạng thái test chính xác tại [Implementation Status](docs/09-IMPLEMENTATION-STATUS.md).
 
@@ -51,7 +51,7 @@ npm run dist:win
 
 GitHub Actions cũng tự chạy quy trình Windows này và xuất file cài đặt dưới dạng build artifact.
 
-Build Windows gần nhất: [Windows Build #23 — thành công, có smoke launch](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212590864). Mở trang run và tải artifact `MH-Sample-FL-Windows-b0ef607e86ac8b2c6fa16ed50e765d317b1abe23`.
+Build Windows lịch sử: [Windows Build #23 — thành công, có smoke launch](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212590864). Artifact này thuộc UI cũ đã bị chủ dự án từ chối và không còn là baseline nghiệm thu. Bản redesign phải có Windows run/artifact mới.
 
 ## Tài liệu chính
 
@@ -86,12 +86,13 @@ Thư mục VST3/JUCE không tồn tại trong codebase. Chỉ ứng dụng deskt
 
 ## Chức năng v0.1.0-alpha
 
-- Chọn và quét thư mục sample thật; không quét ngoài phạm vi người dùng chọn.
-- Index tăng dần, SHA-256, metadata audio, watcher, cancel và progress.
+- Chọn và quét thư mục sample thật; giữ cây folder cha–con/folder rỗng, không gộp root.
+- Hai pha discovery/analyze, SHA-256, metadata audio, BPM/key provenance, watcher, cancel và progress thật.
 - SQLite WAL + FTS5, tìm kiếm, filter, sort, favorite, rating, tags và notes.
-- Preview audio qua protocol nội bộ, waveform thật và player không sửa file nguồn.
+- Preview audio qua protocol nội bộ, waveform thật, tempo sync theo BPM project và trim xuất WAV mới; không ghi đè nguồn.
 - Project Workspace và Project Memory tách `sent_to_fl` khỏi `user_confirmed`.
-- Native desktop drag bridge qua Electron; cần nghiệm thu trực tiếp trên FL Studio Windows.
+- Native desktop drag bridge qua Electron với vùng kéo riêng và fallback; cần nghiệm thu trực tiếp trên FL Studio Windows.
+- Sidebar, results/inspector, Project Memory và bảy cột bảng kéo resize; layout persist và Reset Layout.
 - License/source metadata.
 - Exact duplicate report chỉ đọc/mô phỏng; không xóa hoặc hard-link.
 - Backup SQLite và export JSON.

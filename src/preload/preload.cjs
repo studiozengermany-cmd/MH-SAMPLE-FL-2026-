@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld("mh", {
   library: {
     addFolder: () => ipcRenderer.invoke("library:add-folder"),
     roots: () => ipcRenderer.invoke("library:roots"),
+    tree: (rootId) => ipcRenderer.invoke("library:tree", rootId),
     rescan: (rootId) => ipcRenderer.invoke("library:rescan", rootId),
     cancel: (rootId) => ipcRenderer.invoke("library:cancel", rootId)
   },
@@ -20,6 +21,7 @@ contextBridge.exposeInMainWorld("mh", {
     openFolder: (id) => ipcRenderer.invoke("samples:open-folder", id),
     copyPath: (id) => ipcRenderer.invoke("samples:copy-path", id),
     startDrag: (id, projectId) => ipcRenderer.send("samples:start-drag", { id, projectId }),
+    saveTrimmed: (id, wavBytes, suffix) => ipcRenderer.invoke("samples:save-trimmed", { id, wavBytes, suffix }),
     saveLicense: (id, data) => ipcRenderer.invoke("samples:save-license", id, data)
   },
   projects: {
@@ -36,4 +38,3 @@ contextBridge.exposeInMainWorld("mh", {
     exportSnapshot: () => ipcRenderer.invoke("settings:export")
   }
 });
-

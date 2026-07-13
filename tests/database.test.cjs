@@ -24,3 +24,12 @@ test("database lưu sample, search, project memory và exact duplicate đúng se
   db.close(); fs.rmSync(dir,{recursive:true,force:true});
 });
 
+test("migration v2 tạo backup trước khi thay schema hiện có", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "mh-migration-test-")); const databasePath = path.join(dir, "test.sqlite");
+  const first = new MhDatabase(databasePath); first.db.prepare("DELETE FROM schema_migrations WHERE version=2").run(); first.close();
+  const migrated = new MhDatabase(databasePath);
+  assert.ok(migrated.lastMigrationBackup); assert.equal(fs.existsSync(migrated.lastMigrationBackup), true);
+  assert.ok(fs.statSync(migrated.lastMigrationBackup).size > 0);
+  assert.equal(migrated.db.prepare("SELECT MAX(version) version FROM schema_migrations").get().version, 2);
+  migrated.close(); fs.rmSync(dir, { recursive: true, force: true });
+});

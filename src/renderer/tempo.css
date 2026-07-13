@@ -1,0 +1,26 @@
+.tempo-target {
+  height: 29px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: #92a2a8;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.tempo-target input {
+  width: 43px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dff9f7;
+  font: 9px "Cascadia Mono", Consolas, monospace;
+}
+
+.tempo-target b {
+  color: #607179;
+  font-size: 7px;
+}

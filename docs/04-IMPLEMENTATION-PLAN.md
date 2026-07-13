@@ -21,7 +21,7 @@
 
 ## Milestone 1 — App shell và persistence
 
-- Scaffold Rust workspace và desktop UI.
+- Scaffold Electron main/preload và React/TypeScript renderer theo ADR-009; Rust chỉ là phương án benchmark-gated, không thuộc baseline.
 - Settings, data/cache/backup path và SQLite migrations.
 - App shell, navigation, error boundary, structured logs.
 - Backup/restore database tối thiểu.
@@ -115,7 +115,7 @@
 2. `SPIKE-002`: Audio decode/waveform/resource lifecycle.
 3. `SPIKE-003`: SQLite WAL/FTS với 100k records.
 4. `SPIKE-004`: Crash giữa index và database recovery.
-5. `ARCH-001`: Rust workspace và layer boundaries.
+5. `ARCH-001`: Electron application/domain boundaries; chỉ mở Rust engine bằng ADR mới khi benchmark chứng minh cần thiết.
 6. `DATA-001`: Schema/migrations v1.
 7. `APP-001`: Desktop shell/settings/data locations.
 8. `IDX-001`: Add root và fast index vertical slice.

@@ -13,8 +13,11 @@
 |---|---|---|---|
 | APP-001/002 | Electron app local-first, preload IPC an toàn | `src/main/main.cjs`, `src/preload/preload.cjs` | IMPLEMENTED |
 | LIB-001–005 | Roots, recursive scan, watcher, progress, metadata, SHA-256 | `src/main/indexer.cjs` | VERIFIED BY INTEGRATION TEST |
+| LIB-006–007 | Cây folder cha–con/folder rỗng, filter descendants, discovery trước deep analysis | `database.cjs`, `indexer.cjs`, `App.tsx` | VERIFIED BY NESTED-FOLDER TEST; WINDOWS UI UNTESTED |
 | SEA-001 | SQLite WAL, FTS5 search/filter/sort | `src/main/database.cjs` | VERIFIED BY TEST |
 | AUD-001–004 | Audio protocol, waveform thật, preview player | `WaveformPlayer.tsx`, `main.cjs` | BUILD VERIFIED; DESKTOP RUNTIME UNTESTED |
+| AUD-005–007 | BPM/key provenance, tempo sync preview, In/Out và xuất WAV mới | `utils.cjs`, `indexer.cjs`, `WaveformPlayer.tsx`, `main.cjs` | PARSER TESTED; AUDIO/UI RUNTIME UNTESTED |
+| UX-001–003 | Studio layout theo mockup, cây Local Crate, resizable panes/cột và lưu layout | `App.tsx`, `styles.css` | TYPESCRIPT BUILD VERIFIED; VISUAL ACCEPTANCE PENDING |
 | MEM-001–004 | Project và event provenance/count tách biệt | `database.cjs`, `App.tsx` | VERIFIED BY TEST |
 | FLW-001–003 | Electron native file drag và fallback | `main.cjs`, `App.tsx` | IMPLEMENTED; FL STUDIO UNTESTED |
 | LIC-001 | Source/license record | `database.cjs`, `App.tsx` | IMPLEMENTED; UI BUILD VERIFIED |
@@ -31,8 +34,11 @@ npm run check
 
 Kết quả:
 
-- Node test: `6 passed / 0 failed`.
+- Node test: `10 passed / 0 failed`.
 - Integration test tạo WAV thật, index, metadata, SHA-256, FTS search và backup: PASS.
+- Integration test cây `Drums/Kicks`, `Drums/Snares`, `Vocals/Empty Pack`: giữ đủ 5 folder, folder rỗng, count toàn nhánh, filter descendants và BPM/key filename: PASS.
+- Migration v2 tạo bản SQLite `before-v2` trước thay đổi schema và mở lại ở version 2: PASS.
+- WAV hỏng vẫn hiện trong chỉ mục, BPM/key filename vẫn có provenance và `AUDIO_METADATA_UNREADABLE` được ghi thay vì nuốt lỗi: PASS.
 - TypeScript `tsc --noEmit`: PASS.
 - Vite production build: PASS.
 - Renderer bundle được tạo thành công trong `dist/`.
@@ -54,6 +60,8 @@ Kết quả:
 - GitHub expiry hiện tại: `26/07/2026`; có thể build lại từ source bất kỳ lúc nào.
 
 Smoke launch đã chứng minh bản đóng gói khởi động và giữ process sống trên Windows runner. Nó chưa thay thế nghiệm thu thao tác thật trên Windows 10 và FL Studio của chủ dự án.
+
+**Lưu ý baseline:** artifact trên thuộc giao diện trước khi nhận phản hồi ngày 13/07/2026 và đã bị chủ dự án đánh giá không đạt về bố cục, folder tree, scan, drag, BPM/key/tempo-sync và khả năng resize. Artifact đó chỉ còn là bằng chứng CI lịch sử, không phải bản đề nghị nghiệm thu. Bản redesign hiện tại phải tạo run/artifact mới.
 
 ## Chưa được phép tuyên bố hoàn thành
 

@@ -27,6 +27,7 @@ function createWindow() {
 function registerIpc() {
   ipcMain.handle("app:bootstrap", () => ({ roots: database.listRoots(), stats: database.stats(), projects: database.listProjects(), settings: settingsView() }));
   ipcMain.handle("library:roots", () => database.listRoots());
+  ipcMain.handle("library:tree", (_, rootId) => database.listFolderTree(Number(rootId)));
   ipcMain.handle("library:add-folder", async () => {
     const result = await dialog.showOpenDialog(mainWindow, { properties: ["openDirectory"], title: "Chọn thư mục sample" });
     if (result.canceled || !result.filePaths[0]) return null;
@@ -50,11 +51,24 @@ function registerIpc() {
     const sample = database.getSample(Number(id)); if (!sample) throw new Error("SAMPLE_NOT_FOUND");
     clipboard.writeText(sample.path); return true;
   });
-  ipcMain.on("samples:start-drag", (event, { id, projectId }) => {
+  ipcMain.on("samples:start-drag", (event, { id }) => {
     const sample = database.getSample(Number(id)); if (!sample || !sample.available) return;
-    const icon = nativeImage.createFromDataURL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=");
+    const dragSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#0d2026"/><path d="M18 34h4v-8h-4v8Zm8 8h4V18h-4v24Zm8-5h4V23h-4v14Zm8 9h4V14h-4v32Z" fill="#39e2df"/></svg>`;
+    const icon = nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(dragSvg).toString("base64")}`).resize({ width: 64, height: 64 });
     event.sender.startDrag({ file: sample.path, icon });
-    if (projectId) database.addMemory({ project_id: Number(projectId), sample_id: sample.id, event_type: "sent_to_fl", source: "desktop_drag_accepted", confidence: 0.8 });
+  });
+  ipcMain.handle("samples:save-trimmed", async (_, { id, wavBytes, suffix }) => {
+    const sample = database.getSample(Number(id)); if (!sample) throw new Error("SAMPLE_NOT_FOUND");
+    const base = path.basename(sample.filename, path.extname(sample.filename));
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: "Lưu vùng sample đã cắt",
+      defaultPath: path.join(path.dirname(sample.path), `${base}${suffix || "-trim"}.wav`),
+      filters: [{ name: "WAV audio", extensions: ["wav"] }]
+    });
+    if (result.canceled || !result.filePath) return null;
+    await fs.writeFile(result.filePath, Buffer.from(wavBytes));
+    shell.showItemInFolder(result.filePath);
+    return result.filePath;
   });
   ipcMain.handle("samples:save-license", (_, id, data) => database.upsertLicense(Number(id), data));
 
@@ -98,4 +112,3 @@ app.whenReady().then(() => {
 
 app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
 app.on("before-quit", () => { indexer?.close(); database?.close(); });
-

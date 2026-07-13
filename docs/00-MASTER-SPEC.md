@@ -13,6 +13,17 @@ Sản phẩm giải quyết sáu câu hỏi thực tế:
 5. Nếu dọn thư viện, project cũ có nguy cơ mất đường dẫn không?
 6. Có thể đưa sample sang FL Studio nhanh mà không cần VST3 không?
 
+### Lợi thế không được đánh mất
+
+MH Sample FL không cạnh tranh bằng một danh sách tag/search giống các sample manager đang có. Sản phẩm phải kết hợp bốn thứ trong cùng workflow local:
+
+1. Giữ nguyên cấu trúc folder thật và quyền sở hữu file của producer.
+2. Project Memory nhớ quyết định, vai trò và provenance thay vì chỉ đếm lượt click.
+3. BPM/key/sync/trim/drag phục vụ khoảnh khắc chọn sample, không đẩy producer qua nhiều màn hình.
+4. Project-Safe Lab kiểm tra path, missing, duplicate và license trước khi producer dọn kho.
+
+“Thông minh” chỉ được dùng khi hành vi có dữ liệu chứng minh: xếp hạng theo ngữ cảnh, nhớ lựa chọn, lọc đúng nhánh và báo rõ điều chưa biết. Không dùng AI panel hoặc copy marketing để che chức năng thiếu.
+
 ## 2. Ranh giới chính thức
 
 ### Có trong ứng dụng desktop
@@ -91,6 +102,8 @@ Sản phẩm giải quyết sáu câu hỏi thực tế:
 - Decode WAV, AIFF, FLAC, MP3 và OGG; định dạng khác phải hiện unsupported rõ ràng.
 - Play/pause/stop/seek/previous/next/loop/autoplay.
 - Waveform cache thật, playhead và thời gian thật.
+- Hiển thị BPM/key gốc cùng nguồn/confidence; sync preview theo BPM project và giữ pitch khi runtime hỗ trợ.
+- Vùng cắt In/Out tự nạp sample đang chọn, nghe vùng và xuất WAV mới; không ghi đè nguồn.
 - Volume, output device, buffer; normalize/gain chỉ dùng để nghe thử.
 - Không ghi đè audio gốc.
 - Chỉ một sample phát tại một thời điểm; decode error có cách xử lý.
@@ -170,4 +183,3 @@ Một tính năng chỉ được đánh dấu Done khi:
 4. Có log hoặc bằng chứng test.
 5. Không làm thay đổi file nguồn ngoài phạm vi người dùng xác nhận.
 6. Tài liệu và migration được cập nhật.
-

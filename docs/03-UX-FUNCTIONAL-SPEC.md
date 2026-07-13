@@ -8,6 +8,7 @@
 - Font hỗ trợ tiếng Việt; icon outline đồng nhất; không emoji hoặc neon dư thừa.
 - Spacing 8/12/16/24/32 px; control cao 36–44 px; sidebar 260–300 px.
 - Desktop từ 1280 px; dưới 1024 px chỉ cần chế độ đọc/collapse hợp lý, không nhồi ba pane.
+- Năm ảnh `MUC TIEU DU AN` là visual baseline: độ dày thông tin, Local Crate, table selection, inspector/waveform, Project Memory và vùng drag phải cùng ngôn ngữ studio; phần FL Studio trong ảnh chỉ là bối cảnh workflow, không được nhúng giả vào app.
 
 ## 2. App shell
 
@@ -44,6 +45,7 @@ Chọn scope → scan/hash → exact groups → chọn canonical candidate → s
 - `ResultsTable`, `SampleRow`, `InlinePlayer`, `FavoriteButton`, `BulkActionBar`.
 - `SampleInspector`, `MetadataStrip`, `TagEditor`, `SourceLicenseCard`.
 - `WaveformPlayer`, `TransportControls`, `GainControl`, `OutputDeviceMenu`.
+- `TempoKeyStrip`, `TempoSync`, `TrimRegion`, `TrimWavExport`, `DragToFlCard`.
 - `ProjectSelector`, `ProjectMemoryPanel`, `MemoryEntry`, `ProvenanceBadge`, `ConfidenceBadge`.
 - `DuplicateLab`, `DuplicateGroup`, `SimulationReport`, `PathImpactList`.
 - `JobMonitor`, `Toast`, `ConfirmDialog`, `ErrorPanel`, `EmptyState`, `Skeleton`.
@@ -68,6 +70,7 @@ Không để inspector hiển thị sample cũ khi danh sách hiện tại rỗn
 
 - `Ctrl+K` focus search, `Space` play/pause, mũi tên chọn row, `Enter` mở detail, `Esc` đóng popover.
 - Table có semantic headers, focus indicator và sort announcement.
+- Sidebar, separator dọc/ngang và từng cột bảng kéo đổi kích thước được; layout lưu local và có `Reset Layout`.
 - Player keyboard accessible; trạng thái không chỉ dựa vào màu.
 - Contrast, scale 100–200%, reduced motion và screen-reader labels.
 
@@ -77,4 +80,3 @@ Không để inspector hiển thị sample cũ khi danh sách hiện tại rỗn
 - `Mô phỏng hoàn tất` thay vì `An toàn tuyệt đối`.
 - `Không thể xác minh` thay vì bỏ qua lỗi.
 - Normalize/Gain ghi rõ `Chỉ nghe thử — không sửa file gốc`.
-
