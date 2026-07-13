@@ -51,7 +51,7 @@ npm run dist:win
 
 GitHub Actions cũng tự chạy quy trình Windows này và xuất file cài đặt dưới dạng build artifact.
 
-Build Windows lịch sử: [Windows Build #23 — thành công, có smoke launch](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212590864). Artifact này thuộc UI cũ đã bị chủ dự án từ chối và không còn là baseline nghiệm thu. Bản redesign phải có Windows run/artifact mới.
+Build Windows redesign: [Windows Build #24 — 10 test, NSIS và smoke launch thành công](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29214548160). Tải artifact `MH-Sample-FL-Windows-8e45bcee609a1dd71402ab23ee4a895872f10070` từ trang run. Đây là bản cần nghiệm thu UI/scan/audio/drag thật trên máy anh; chưa tự động coi là đạt FL Studio.
 
 ## Tài liệu chính
 

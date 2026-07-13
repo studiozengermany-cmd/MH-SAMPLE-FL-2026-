@@ -43,25 +43,25 @@ Kết quả:
 - Vite production build: PASS.
 - Renderer bundle được tạo thành công trong `dist/`.
 
-## Bằng chứng Windows CI
+## Bằng chứng Windows CI của redesign
 
 - Workflow: `Windows Build`.
-- Run: [`29212590864`](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29212590864).
-- Commit: `b0ef607e86ac8b2c6fa16ed50e765d317b1abe23`.
+- Run: [`29214548160`](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29214548160).
+- Commit: `8e45bcee609a1dd71402ab23ee4a895872f10070`.
 - Install dependencies: PASS.
-- 6/6 tests trên Windows: PASS.
+- 10/10 tests trên Windows: PASS.
 - TypeScript/Vite production build: PASS.
 - Electron-builder NSIS: PASS.
 - Smoke launch packaged `MH Sample FL.exe` trong 8 giây: PASS.
 - Upload artifact: PASS.
-- Artifact: `MH-Sample-FL-Windows-b0ef607e86ac8b2c6fa16ed50e765d317b1abe23`.
-- Artifact size: `100,186,459 bytes`.
-- Artifact digest: `sha256:15302f2b47b3d2248047157054d0cec7e96b19b9ad44d27744959f4ad0857797`.
-- GitHub expiry hiện tại: `26/07/2026`; có thể build lại từ source bất kỳ lúc nào.
+- Artifact: `MH-Sample-FL-Windows-8e45bcee609a1dd71402ab23ee4a895872f10070`.
+- Artifact size: `100,194,059 bytes`.
+- Artifact digest: `sha256:cd040e329c7b2351717bc7d94bf14972b3ac30051be3d042d857cc2603c41378`.
+- GitHub expiry hiện tại: `27/07/2026`; có thể build lại từ source bất kỳ lúc nào.
 
 Smoke launch đã chứng minh bản đóng gói khởi động và giữ process sống trên Windows runner. Nó chưa thay thế nghiệm thu thao tác thật trên Windows 10 và FL Studio của chủ dự án.
 
-**Lưu ý baseline:** artifact trên thuộc giao diện trước khi nhận phản hồi ngày 13/07/2026 và đã bị chủ dự án đánh giá không đạt về bố cục, folder tree, scan, drag, BPM/key/tempo-sync và khả năng resize. Artifact đó chỉ còn là bằng chứng CI lịch sử, không phải bản đề nghị nghiệm thu. Bản redesign hiện tại phải tạo run/artifact mới.
+Artifact cũ của run `29212590864` thuộc giao diện bị từ chối ngày 13/07/2026 và chỉ còn là bằng chứng CI lịch sử. Artifact của run `29214548160` là baseline redesign đầu tiên để chủ dự án kiểm tra.
 
 ## Chưa được phép tuyên bố hoàn thành
 
