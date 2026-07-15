@@ -1,34 +1,64 @@
 # MH Sample FL
 
-MH Sample FL là ứng dụng desktop local-first dành cho producer sử dụng FL Studio để quản lý thư viện sample, tìm và nghe nhanh, ghi nhớ sample đã dùng theo ngữ cảnh dự án, theo dõi nguồn/license và xử lý file thiếu hoặc trùng lặp theo quy trình an toàn.
+> **Trạng thái:** dự án cá nhân đang phát triển, phiên bản `v0.1.0-alpha`. Chưa phải sản phẩm thương mại và chưa được phát hành như một công cụ ổn định cho người dùng cuối.
 
-## Quyết định chính thức
+MH Sample FL được Minh Hiếu xây dựng trước hết để giải quyết nhu cầu thật khi làm nhạc với FL Studio: thư viện sample ngày càng lớn, khó tìm lại âm thanh đã dùng, dễ thất lạc nguồn hoặc license, và khó kiểm tra file thiếu hoặc trùng lặp.
 
-1. Đây là dự án greenfield, được xây mới hoàn toàn.
-2. Không sao chép, merge hoặc kế thừa code từ bất kỳ dự án SampleGuard/Sample FL cũ nào.
-3. Tên sản phẩm chính thức từ ngày 12/07/2026 là **MH Sample FL**.
-4. Giai đoạn 1 chỉ xây **ứng dụng desktop độc lập**.
-5. VST3 thuộc giai đoạn 2 và chỉ bắt đầu sau khi ứng dụng desktop đã ổn định, có người dùng thật và được phê duyệt riêng.
-6. Không cloud mặc định, không bắt buộc tài khoản, API key hay gói trả phí.
-7. Không tự động xóa, di chuyển, đổi tên, hard-link hoặc sửa file âm thanh gốc.
-8. Mọi số liệu và trạng thái trên UI phải có nguồn dữ liệu thật; cấm fake UI, placeholder và dữ liệu demo giả làm dữ liệu thật.
+Mục tiêu của dự án là làm một công cụ hữu ích cho công việc cá nhân trước. Khi phần mềm đủ ổn định, an toàn và có kiểm chứng thực tế, dự án có thể được chia sẻ để cộng đồng producer dùng thử. Repository này không dùng để quảng cáo những tính năng chưa tồn tại hoặc chưa được kiểm tra.
 
-## Giá trị cốt lõi
+## Dự án này đang làm gì?
 
-- **Find:** tìm sample nhanh trong nhiều thư mục và ổ đĩa.
-- **Preview:** nghe, xem waveform và metadata mà không sửa file gốc.
-- **Remember:** lưu project, role, style, note và lịch sử quyết định của producer.
-- **Protect:** phát hiện file missing/trùng và đánh giá tác động trước mọi thao tác.
-- **Prove:** lưu nguồn gốc, license, hóa đơn hoặc tài liệu chứng minh.
-- **Integrate:** kéo file từ ứng dụng desktop sang FL Studio bằng cơ chế hệ điều hành; không giả vờ là integration sâu khi chưa có bằng chứng.
+- Tìm sample trong nhiều thư mục và ổ đĩa.
+- Nghe preview, xem waveform và metadata mà không sửa file gốc.
+- Ghi nhớ sample đã liên quan đến project nào, vai trò gì và ghi chú của người dùng.
+- Lưu thông tin nguồn, license, hóa đơn hoặc tài liệu chứng minh.
+- Phát hiện file thiếu và file trùng chính xác theo quy trình chỉ đọc hoặc mô phỏng.
+- Kéo file từ ứng dụng desktop sang FL Studio bằng cơ chế của hệ điều hành.
+
+## Nguyên tắc bắt buộc
+
+1. **Local-first:** chức năng chính chạy trên máy người dùng.
+2. **Không bắt buộc cloud:** không yêu cầu tài khoản, API key hoặc gói trả phí để dùng phần desktop cốt lõi.
+3. **Không phá dữ liệu:** không tự động xóa, di chuyển, đổi tên, hard-link, ghi đè hoặc sửa file âm thanh gốc.
+4. **Không dữ liệu giả:** số liệu và trạng thái trên giao diện phải đến từ dữ liệu thật.
+5. **Không tuyên bố quá mức:** build thành công không đồng nghĩa tính năng đã được nghiệm thu trong FL Studio.
+6. **Desktop trước:** VST3 chưa được triển khai và chỉ được xem xét sau khi ứng dụng desktop đủ ổn định.
+7. **Chưa thương mại hóa:** hiện tại đây là dự án phát triển và thử nghiệm cá nhân.
 
 ## Trạng thái hiện tại
 
-`v0.1.0-alpha / DESKTOP REDESIGN IN PROGRESS` — source hiện có cây folder thật, fast discovery + deep analysis, SQLite search, BPM/key provenance, tempo-sync preview, waveform + vùng trim xuất WAV mới, Project Memory, exact duplicate report, backup/export và workspace dark studio kéo resize. Runtime Windows/FL Studio của bản redesign vẫn chờ evidence mới. VST3 chưa được triển khai và vẫn bị khóa bằng policy gate.
+Mã nguồn hiện có:
 
-Xem trạng thái test chính xác tại [Implementation Status](docs/09-IMPLEMENTATION-STATUS.md).
+- Electron, React và TypeScript.
+- SQLite WAL và FTS5 cho tìm kiếm, lọc và sắp xếp.
+- Quét thư mục, giữ cấu trúc folder cha–con và folder rỗng.
+- SHA-256, metadata âm thanh, BPM/key kèm nguồn suy luận.
+- Preview audio, waveform và vùng In/Out để xuất một file WAV mới.
+- Project Workspace và Project Memory.
+- Báo cáo exact duplicate theo hướng không destructive.
+- Backup SQLite và export JSON.
+- Quy trình test, build renderer và đóng gói Windows NSIS.
 
-## Chạy ứng dụng khi phát triển
+Bằng chứng hiện có của baseline redesign:
+
+- `10/10` automated tests chạy thành công trên Windows CI.
+- TypeScript/Vite production build thành công.
+- NSIS installer được tạo thành công.
+- Packaged application đã qua smoke launch trên Windows runner.
+
+Xem chi tiết tại [Trạng thái triển khai và bằng chứng](docs/09-IMPLEMENTATION-STATUS.md).
+
+### Những phần chưa được phép coi là hoàn thành
+
+- Chưa nghiệm thu đầy đủ bản cài trên máy Windows thật của chủ dự án.
+- Chưa xác nhận toàn bộ thao tác scan, preview và audio UI trong điều kiện sử dụng thật.
+- Chưa nghiệm thu native drag với Channel Rack, Playlist hoặc Sampler trong FL Studio.
+- Chưa performance test với thư viện khoảng 100.000 sample.
+- Chưa kiểm thử crash hoặc mất điện thực tế trên Windows.
+
+Các mục này phải giữ trạng thái chưa kiểm chứng cho đến khi có log, ảnh, video hoặc kết quả test thật.
+
+## Chạy khi phát triển
 
 Yêu cầu Node.js 24 trở lên.
 
@@ -37,7 +67,7 @@ npm install
 npm run dev
 ```
 
-Kiểm tra toàn bộ unit/integration test và production renderer build:
+Chạy test và production renderer build:
 
 ```bash
 npm run check
@@ -49,9 +79,22 @@ npm run check
 npm run dist:win
 ```
 
-GitHub Actions cũng tự chạy quy trình Windows này và xuất file cài đặt dưới dạng build artifact.
+GitHub Actions cũng chạy quy trình Windows và tạo build artifact. Artifact CI chỉ là bằng chứng kỹ thuật tạm thời, không tự động được coi là bản phát hành chính thức.
 
-Build Windows redesign: [Windows Build #24 — 10 test, NSIS và smoke launch thành công](https://github.com/studiozengermany-cmd/MH-SAMPLE-FL-2026-/actions/runs/29214548160). Tải artifact `MH-Sample-FL-Windows-8e45bcee609a1dd71402ab23ee4a895872f10070` từ trang run. Đây là bản cần nghiệm thu UI/scan/audio/drag thật trên máy anh; chưa tự động coi là đạt FL Studio.
+## Cấu trúc source
+
+```text
+MH-Sample-FL/
+├─ src/
+│  ├─ main/                    # Electron main, SQLite, indexer, filesystem
+│  ├─ preload/                 # IPC bridge có context isolation
+│  └─ renderer/                # React/TypeScript UI và workflow
+├─ tests/
+├─ .github/workflows/
+└─ docs/
+```
+
+Thư mục VST3/JUCE không tồn tại trong codebase hiện tại.
 
 ## Tài liệu chính
 
@@ -63,37 +106,15 @@ Build Windows redesign: [Windows Build #24 — 10 test, NSIS và smoke launch th
 - [Kiểm thử và nghiệm thu](docs/05-TEST-ACCEPTANCE.md)
 - [Lộ trình VST3 giai đoạn sau](docs/06-VST3-PHASE-2.md)
 - [Nhật ký quyết định](docs/07-DECISION-LOG.md)
-- [Cam kết thực thi và truy vết yêu cầu](docs/08-EXECUTION-GOVERNANCE.md)
-- [Trạng thái triển khai và bằng chứng](docs/09-IMPLEMENTATION-STATUS.md)
+- [Truy vết yêu cầu](docs/08-EXECUTION-GOVERNANCE.md)
+- [Trạng thái triển khai](docs/09-IMPLEMENTATION-STATUS.md)
 
-## Cấu trúc source hiện tại
+## Quyền sử dụng
 
-```text
-MH-Sample-FL/
-├─ src/
-│  ├─ main/                    # Electron main, SQLite, indexer, filesystem
-│  ├─ preload/                 # IPC bridge có context isolation
-│  └─ renderer/                # React/TypeScript UI, waveform và workflow
-├─ tests/
-│  ├─ database.test.cjs
-│  ├─ indexer.test.cjs
-│  └─ utils.test.cjs
-├─ .github/workflows/          # Test và đóng gói Windows
-└─ docs/
-```
+Repository hiện được công khai để minh bạch quá trình phát triển và kiểm chứng. Package hiện đặt trạng thái `UNLICENSED`; việc repository công khai không tự động cấp quyền sao chép, đóng gói lại hoặc sử dụng thương mại.
 
-Thư mục VST3/JUCE không tồn tại trong codebase. Chỉ ứng dụng desktop đang được triển khai.
+## Liên hệ
 
-## Chức năng v0.1.0-alpha
-
-- Chọn và quét thư mục sample thật; giữ cây folder cha–con/folder rỗng, không gộp root.
-- Hai pha discovery/analyze, SHA-256, metadata audio, BPM/key provenance, watcher, cancel và progress thật.
-- SQLite WAL + FTS5, tìm kiếm, filter, sort, favorite, rating, tags và notes.
-- Preview audio qua protocol nội bộ, waveform thật, tempo sync theo BPM project và trim xuất WAV mới; không ghi đè nguồn.
-- Project Workspace và Project Memory tách `sent_to_fl` khỏi `user_confirmed`.
-- Native desktop drag bridge qua Electron với vùng kéo riêng và fallback; cần nghiệm thu trực tiếp trên FL Studio Windows.
-- Sidebar, results/inspector, Project Memory và bảy cột bảng kéo resize; layout persist và Reset Layout.
-- License/source metadata.
-- Exact duplicate report chỉ đọc/mô phỏng; không xóa hoặc hard-link.
-- Backup SQLite và export JSON.
-- UI tiếng Việt, desktop-first, có loading/empty/error states.
+- Website: https://studiominhhieu.com/
+- Email: support@studiominhhieu.com
+- GitHub: https://github.com/studiozengermany-cmd
